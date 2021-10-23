@@ -1,6 +1,5 @@
 const bcrypty = require("bcrypt");
 
-const checkAuth = require("../middleware/check-auth");
 let User = require("../models/users.model");
 
 /* get all users */
@@ -12,39 +11,67 @@ exports.user_get_all = (req, res) => {
 
 /* add a user  */
 exports.add_user = (req, res) => {
-  const fullName = req.body.userName;
-  const dateOfBirth = req.body.dateOfBirth;
-  const email = req.body.email;
-  const contactNumber = req.body.contactNumber;
-  const department = req.body.department;
-  const role = req.body.role;
-  const workExperience = req.body.workExperience;
-  const academicInfo = req.body.academicInfo;
+  const {
+    fullName,
+    dateOfBirth,
+    email,
+    password,
+    contactNumber,
+    department,
+    role,
+    workExperience,
+    academicInfo,
+  } = req.body;
 
+  console.log(`req`, req);
+  let document = null;
+  if (req.file) document = req.file.path;
+  console.log(`document`, document);
   User.find({ email }, (error, user) => {
     if (user.length > 0) res.status(403).json("Email already exits.");
     else {
-      bcrypty.hash(req.body.password, 10, (err, hash) => {
-        if (err) res.status(400).json("Error: " + err);
-        else {
-          const newUser = new User({
-            fullName,
-            dateOfBirth,
-            email,
-            password: hash,
-            contactNumber,
-            department,
-            role,
-            workExperience,
-            academicInfo,
-          });
+      if (fullName == null || fullName == "") {
+        res.status(403).json("Full name is required ");
+      } else if (dateOfBirth == null || dateOfBirth == "") {
+        res.status(403).json("DOB is required ");
+      } else if (email == null || email == "") {
+        res.status(403).json("Email is required ");
+      } else if (password == null || password == "") {
+        res.status(403).json("Password is required ");
+      } else if (contactNumber == null || contactNumber == "") {
+        res.status(403).json("Contact Number is required ");
+      } else if (department == null || department == "") {
+        res.status(403).json("Department is required ");
+      } else if (role == null || role == "") {
+        res.status(403).json("Role is required ");
+      } else if (workExperience == null || workExperience == "") {
+        res.status(403).json("Work Experience is required ");
+      } else if (academicInfo == null || academicInfo == "") {
+        res.status(403).json("Academic Info is required ");
+      } else {
+        bcrypty.hash(password, 10, (err, hash) => {
+          if (err) res.status(400).json("Error : insufficient data " + err);
+          else {
+            const newUser = new User({
+              fullName,
+              dateOfBirth,
+              email,
+              password: hash,
+              contactNumber,
+              department,
+              role,
+              workExperience,
+              academicInfo,
+              document,
+            });
 
-          newUser
-            .save()
-            .then(() => res.json("User added successfully!"))
-            .catch((err) => res.status(400).json("Error: " + err));
-        }
-      });
+            newUser
+              .save()
+              .then(() => res.json("User added successfully!"))
+              .catch((err) => res.status(400).json("Error: " + err));
+          }
+        });
+      }
     }
   });
 };

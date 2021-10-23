@@ -43,6 +43,9 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    document: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
