@@ -1,0 +1,3 @@
+export const STORAGE_CONSTANTS = {
+  ACCESS_TOKEN: "ACCESS_TOKEN",
+};
