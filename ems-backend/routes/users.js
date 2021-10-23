@@ -7,6 +7,7 @@ router.route("/").get((req, res) => {
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
+/* add new user */
 router.route("/add").post((req, res) => {
   const fullName = req.body.userName;
   const dateOfBirth = req.body.dateOfBirth;
