@@ -23,10 +23,9 @@ exports.add_user = (req, res) => {
     academicInfo,
   } = req.body;
 
-  console.log(`req`, req);
   let document = null;
   if (req.file) document = req.file.path;
-  console.log(`document`, document);
+
   User.find({ email }, (error, user) => {
     if (user.length > 0) res.status(403).json("Email already exits.");
     else {
