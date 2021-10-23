@@ -1,23 +1,11 @@
 const router = require("express").Router();
+const DepartmentController = require("../controllers/department-controller");
 let Departments = require("../models/departments.model");
 
-router.route("/").get((req, res) => {
-  Departments.find()
-    .then((departments) => res.json(departments))
-    .catch((err) => res.status(400).json("Error: " + err));
-});
+/* get all departments */
+router.route("/").get(DepartmentController.get_all_departments);
 
-router.route("/add").post((req, res) => {
-  const department = req.body.department;
-
-  const newDepartment = new Departments({
-    department,
-  });
-
-  newDepartment
-    .save()
-    .then(() => res.json("Department added successfully!"))
-    .catch((err) => res.status(400).json("Error: " + err));
-});
+/* add new department */
+router.route("/add").post(DepartmentController.add_department);
 
 module.exports = router;

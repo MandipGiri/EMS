@@ -20,9 +20,19 @@ connection.once("open", () => {
 app.use(cors());
 app.use(express.json());
 
+const departmentsRouter = require("./routes/departments");
+const rolesRouter = require("./routes/roles");
 const usersRouter = require("./routes/users");
+const authRouter = require("./routes/auth");
 
-app.use("/users", usersRouter);
+app.use("/api/v1/departments", departmentsRouter);
+app.use("/api/v1/roles", rolesRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/auth", authRouter);
+
+app.use("*", (req, res) =>
+  res.status(404).json("Error: No such route exists!")
+);
 
 app.listen(port, () => {
   console.log(`Server is running on port:${port}`);
