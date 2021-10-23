@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 ems-backend/node_modules
+ems-backend/uploads
 /.pnp
 .pnp.js
 
