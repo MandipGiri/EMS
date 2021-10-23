@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { STORAGE_CONSTANTS } from "./utilities/StorageConstants";
+import  Navbar  from "./components/header/Navbar.component";
 
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
@@ -10,7 +11,8 @@ function App() {
 
   return (
     <div className="container">
-      {isLoggedIn ? "HELLO WORLD Logged IN" : "HELLO WORLD"}
+      {/* {isLoggedIn ? "HELLO WORLD Logged IN" : "HELLO WORLD"} */}
+      <Navbar />
     </div>
   );
 }
