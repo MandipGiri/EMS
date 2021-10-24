@@ -46,6 +46,10 @@ const userSchema = new Schema(
     document: {
       type: String,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

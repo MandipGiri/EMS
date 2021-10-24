@@ -8,10 +8,25 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserStart } from "../../redux/user/user.action";
+import { selectUserInitials } from "../../redux/user/user.selector";
+import { useHistory } from "react-router-dom";
+import RootContext from "../../context/RootContext.js";
 
 export default function AccountMenu() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const initials = useSelector(selectUserInitials);
+  const context = React.useContext(RootContext);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+
+  React.useEffect(() => {
+    dispatch(getUserStart());
+  }, []);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -24,9 +39,13 @@ export default function AccountMenu() {
         <Tooltip title="Account settings">
           <>
             <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
-              <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+              <Avatar sx={{ width: 32, height: 32 }}>{initials ?? ""}</Avatar>
             </IconButton>
-            <ArrowDropDownRoundedIcon onClick={handleClick} fontSize="medium" sx={{marginLeft:-1}}/>
+            <ArrowDropDownRoundedIcon
+              onClick={handleClick}
+              fontSize="medium"
+              sx={{ marginLeft: -1 }}
+            />
           </>
         </Tooltip>
       </Box>
@@ -68,7 +87,7 @@ export default function AccountMenu() {
           <Avatar /> My Profile
         </MenuItem>
 
-        <MenuItem>
+        <MenuItem onClick={context?.logout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

@@ -7,8 +7,6 @@ import { loginSuccess, loginFailure } from "./login.action";
 import { LoginActionTypes } from "./login.types";
 
 export function* login({ email, password }) {
-  console.log(`email`, email);
-  console.log(`password`, password);
   try {
     const success = yield Axios.post(API_ENDPOINTS.LOGIN, {
       email,
@@ -26,7 +24,7 @@ export function* login({ email, password }) {
 }
 
 export function* loginStart() {
-  console.log('object')
+  console.log("object");
   yield takeLatest(LoginActionTypes.LOGIN_PROCESSING, login);
 }
 

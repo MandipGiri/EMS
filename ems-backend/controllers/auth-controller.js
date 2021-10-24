@@ -44,3 +44,15 @@ exports.change_password = (req, res) => {
     });
   }
 };
+
+exports.profile = (req, res) => {
+  const userId = req.userData.userId;
+  Users.findOne(
+    { _id: userId },
+    { password: 0, __v: 0, updatedAt: 0 },
+    (error, user) => {
+      if (user) res.json(user);
+      else res.status(403).json("Error:" + error);
+    }
+  );
+};

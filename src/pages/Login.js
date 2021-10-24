@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useEffect, useContext, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -15,50 +13,39 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { loginStart } from "../redux/login/login.action";
+import { selectLogin } from "../redux/login/login.selector";
 import { useDispatch, useSelector } from "react-redux";
+import RootContext from "../context/RootContext";
+import { STORAGE_CONSTANTS } from "../utilities/StorageConstants";
+import { useHistory } from "react-router-dom";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required("Required").email("Invalid email"),
   password: Yup.string().required("Required"),
 });
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 const theme = createTheme();
 
 export default function Login() {
   const dispatch = useDispatch();
+  const loginReducer = useSelector(selectLogin);
+  const context = useContext(RootContext);
+  const history = useHistory();
+
+  const [processing, setprocessing] = useState(false);
+  const [initialLoad, setinitialLoad] = useState(true);
 
   const {
     handleChange,
-    handleBlur,
     handleSubmit,
     values,
     errors,
-    touched,
     isValid,
     dirty,
   } = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      console.log(`values`, values)
       dispatch(loginStart(values.email, values.password));
     },
   });
@@ -67,6 +54,20 @@ export default function Login() {
     event.preventDefault();
     handleSubmit();
   };
+
+  useEffect(() => {
+    setinitialLoad(false);
+  }, []);
+
+  useEffect(() => {
+    const { processing, success } = loginReducer;
+    setprocessing(processing);
+    if (success && !initialLoad) {
+      localStorage.setItem(STORAGE_CONSTANTS.ACCESS_TOKEN, success);
+      context?.showToastMessage("Login Successful!");
+      history.push("/dashboard");
+    }
+  }, [loginReducer]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -115,10 +116,7 @@ export default function Login() {
               error={errors.password ?? false}
               helperText={errors.password ?? ""}
             />
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
+
             <Button
               type="submit"
               fullWidth
@@ -126,28 +124,15 @@ export default function Login() {
               sx={{ mt: 3, mb: 2 }}
               disabled={!(isValid && dirty)}
             >
-              Sign In
+              {processing ? <CircularProgress /> : `Sign In`}
             </Button>
             <Grid>
               <Typography>For test purposes for intial login use</Typography>
               <Typography>Email: admin@ems.com</Typography>
               <Typography>Password: admin@123</Typography>
             </Grid>
-            {/* <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid> */}
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
     </ThemeProvider>
   );
