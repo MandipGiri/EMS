@@ -10,3 +10,4 @@ router
   .route("/change-password")
   .post(checkAuth, AuthController.change_password);
 module.exports = router;
+

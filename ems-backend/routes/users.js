@@ -28,6 +28,8 @@ let UserController = require("../controllers/user-controller");
 /* GET all users */
 router.route("/").get(checkAuth, UserController.user_get_all);
 
+router.route("/user/:userId").get(UserController.get_user);
+
 /* POST add new user */
 router
   .route("/add")
@@ -36,4 +38,5 @@ router
 /* DELETE delete user */
 router.route("/delete/:userId").delete(checkAuth, UserController.delete_user);
 
+/* get user detail */
 module.exports = router;
