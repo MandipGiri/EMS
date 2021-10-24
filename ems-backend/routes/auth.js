@@ -5,6 +5,9 @@ const checkAuth = require("../middleware/check-auth");
 /* user login */
 router.route("/login").post(AuthController.login);
 
+/* profile */
+router.route("/profile").get(checkAuth, AuthController.profile);
+
 /* change user password */
 router
   .route("/change-password")

@@ -4,7 +4,22 @@ let User = require("../models/users.model");
 
 /* get all users */
 exports.user_get_all = (req, res) => {
-  User.find()
+  /* query to not give out admin account as user and not sending some fields */
+  User.find(
+    { email: { $ne: "admin@ems.com" }, isVerified: true },
+    { password: 0, __v: 0, updatedAt: 0 }
+  )
+    .then((users) => res.json(users))
+    .catch((err) => res.status(400).json("Error: " + err));
+};
+
+/* get approval list */
+exports.get_pending_user = (req, res) => {
+  /* query to not give out admin account as user and not sending some fields */
+  User.find(
+    { email: { $ne: "admin@ems.com" }, isVerified: false },
+    { password: 0, __v: 0, updatedAt: 0 }
+  )
     .then((users) => res.json(users))
     .catch((err) => res.status(400).json("Error: " + err));
 };
@@ -78,9 +93,26 @@ exports.add_user = (req, res) => {
 /* remove a user */
 exports.delete_user = (req, res) => {
   const userId = req.params.userId;
-  User.findOne({ _id: userId }, (error, user) => {});
-  User.remove({ _id: userId }, (err, success) => {
-    if (err) res.status(400).json("Error: " + err);
-    else res.json("User deleted successfully.");
+  User.findOne({ _id: userId }, (error, user) => {
+    if (user) {
+      User.remove({ _id: userId }, (err, success) => {
+        if (err) res.status(400).json("Error: " + err);
+        else res.json("User deleted successfully.");
+      });
+    }
+    elsees.status(400).json("Error: " + error);
   });
+};
+
+/* get user detail */
+exports.get_user = (req, res) => {
+  const userId = req.params.userId;
+  User.findOne(
+    { _id: userId },
+    { password: 0, __v: 0, updatedAt: 0 },
+    (error, user) => {
+      if (user) res.json(user);
+      else res.status(403).json("Error:" + error);
+    }
+  );
 };
