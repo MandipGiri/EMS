@@ -21,6 +21,13 @@ import { selectUser } from "../../redux/user/user.selector";
 import GroupIcon from "@mui/icons-material/Group";
 import DomainVerificationIcon from "@mui/icons-material/DomainVerification";
 import Users from "../../pages/Users";
+import PendingUsers from "../../pages/PendingUsers";
+import AddEditUser from "../form/AddEditUser";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
 
 const drawerWidth = 240;
 
@@ -95,7 +102,9 @@ export default function MiniDrawer() {
   const user = useSelector(selectUser);
   const { email, fullName, department, role } = user || {};
 
-  const [currentItem, setcurrentItem] = React.useState("Users");
+  const [activeItem, setactiveItem] = React.useState("Users");
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [editableData, seteditableData] = React.useState(null);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -103,6 +112,15 @@ export default function MiniDrawer() {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleOpenDialog = (data) => {
+    seteditableData(data);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   return (
@@ -123,7 +141,7 @@ export default function MiniDrawer() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            CF - EMS
+            Cloud Factory - EMS
           </Typography>
           <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
             <AccountMenu />
@@ -142,7 +160,7 @@ export default function MiniDrawer() {
         </DrawerHeader>
         <Divider />
         <List>
-          <ListItem button>
+          <ListItem button onClick={() => setactiveItem("Users")}>
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
@@ -152,7 +170,7 @@ export default function MiniDrawer() {
         {role == "Admin" && <Divider />}
         {role == "Admin" && (
           <List>
-            <ListItem button>
+            <ListItem button onClick={() => setactiveItem("PendingUsers")}>
               <ListItemIcon>
                 <DomainVerificationIcon />
               </ListItemIcon>
@@ -163,7 +181,21 @@ export default function MiniDrawer() {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        <Users />
+        {activeItem == "Users" ? (
+          <Users {...{ handleOpenDialog }} />
+        ) : (
+          <PendingUsers {...{ handleOpenDialog }} />
+        )}
+
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>ADD USER</DialogTitle>
+          <DialogContent>
+            <AddEditUser data={null} {...{handleCloseDialog}}/>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

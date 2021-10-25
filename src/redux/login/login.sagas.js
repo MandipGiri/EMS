@@ -12,7 +12,7 @@ export function* login({ email, password }) {
       email,
       password,
     });
-    console.log(`success`, success);
+
     const {
       data: { token },
     } = success;
@@ -24,7 +24,6 @@ export function* login({ email, password }) {
 }
 
 export function* loginStart() {
-  console.log("object");
   yield takeLatest(LoginActionTypes.LOGIN_PROCESSING, login);
 }
 

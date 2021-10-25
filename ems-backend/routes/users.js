@@ -29,10 +29,15 @@ let UserController = require("../controllers/user-controller");
 router.route("/").get(checkAuth, UserController.user_get_all);
 
 /* GET User detail by user ID */
-router.route("/user/:userId").get(UserController.get_user);
+router.route("/user/:userId").get(checkAuth, UserController.get_user);
+
+/* POST accept user */
+router
+  .route("/accept-user/:userId")
+  .post(checkAuth, UserController.accept_user);
 
 /* GET all pending users */
-router.route("/pending-users").get(UserController.get_pending_user);
+router.route("/pending-users").get(checkAuth, UserController.get_pending_user);
 
 /* POST add new user */
 router

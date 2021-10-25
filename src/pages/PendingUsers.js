@@ -4,25 +4,27 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../redux/user/user.selector";
-import { getUsersStart } from "../redux/users/users.action";
 import { createStructuredSelector } from "reselect";
-import { selectUsers } from "../redux/users/users.selector";
+import { selectPendingUsers } from "../redux/users/users.selector";
 import moment from "moment";
-import { Grid, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { getPendingUsersStart } from "../redux/users/users.action";
+import { acceptUser } from "../services/ApiCalls";
 
-const Users = ({ handleOpenDialog }) => {
+export default function PendingUsers({ handleOpenDialog }) {
   const dispatch = useDispatch();
   const { user, users } = useSelector(
     createStructuredSelector({
       user: selectUser,
-      users: selectUsers,
+      users: selectPendingUsers,
     })
   );
 
@@ -33,19 +35,25 @@ const Users = ({ handleOpenDialog }) => {
   const [usersList, setusersList] = React.useState([]);
 
   React.useEffect(() => {
-    dispatch(getUsersStart());
+    dispatch(getPendingUsersStart());
   }, []);
 
   React.useEffect(() => {
     if (users) setusersList(users);
   }, [users]);
 
+  const handleAccept = (userId) => {
+    acceptUser(userId).then((res) => {
+      dispatch(getPendingUsersStart());
+    });
+  };
+
   return (
     <React.Fragment>
       <Grid container spacing={2}>
         <Grid item xs={10}>
           <Typography variant="h5" color="#1976d2">
-            Users
+            User Approvals
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -92,12 +100,12 @@ const Users = ({ handleOpenDialog }) => {
                 >
                   <IconButton
                     aria-label="edit"
-                    onClick={() => handleOpenDialog(row)}
+                    onClick={() => handleAccept(row._id)}
                   >
-                    <ModeEditIcon style={{ color: "#1976d2" }} />
+                    <CheckCircleIcon style={{ color: "#50c878" }} />
                   </IconButton>
                   <IconButton aria-label="delete">
-                    <DeleteIcon style={{ color: "#FF0800" }} />
+                    <CancelIcon style={{ color: "#FF0800" }} />
                   </IconButton>
                 </TableCell>
               )}
@@ -107,6 +115,4 @@ const Users = ({ handleOpenDialog }) => {
       </Table>
     </React.Fragment>
   );
-};
-
-export default Users;
+}

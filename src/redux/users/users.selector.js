@@ -6,3 +6,8 @@ export const selectUsers = createSelector(
   [selectUsersRoot],
   (users) => users.success
 );
+
+export const selectPendingUsers = createSelector(
+  [selectUsersRoot],
+  (users) => users.pendingList
+);

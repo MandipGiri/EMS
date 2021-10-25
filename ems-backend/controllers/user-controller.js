@@ -116,3 +116,16 @@ exports.get_user = (req, res) => {
     }
   );
 };
+
+/* get user detail */
+exports.accept_user = (req, res) => {
+  const userId = req.params.userId;
+  User.updateOne(
+    { _id: userId },
+    { $set: { isVerified: true } },
+    (error, response) => {
+      if (response) res.json("User is now a employee!");
+      else res.status(403).json("Error:" + error);
+    }
+  );
+};

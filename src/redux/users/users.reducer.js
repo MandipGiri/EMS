@@ -4,6 +4,8 @@ const initialState = {
   processing: false,
   success: null,
   error: null,
+
+  pendingList: [],
 };
 
 export const usersReducer = (state = initialState, action) => {
@@ -26,6 +28,17 @@ export const usersReducer = (state = initialState, action) => {
         ...state,
         processing: false,
         error: action.payload,
+      };
+    case UsersActionTypes.GET_PENDING_USERS_SUCCESS:
+      return {
+        ...state,
+        pendingList: action.payload,
+      };
+      case UsersActionTypes.GET_USERS_PROCESSING:
+      case UsersActionTypes.GET_PENDING_USERS_FAILURE:
+      return {
+        ...state,
+        pendingList: [],
       };
     default:
       return state;
