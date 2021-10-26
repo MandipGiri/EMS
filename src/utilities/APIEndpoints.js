@@ -9,4 +9,6 @@ export const API_ENDPOINTS = {
   GET_DEPARTMENTS: "departments",
   GET_ROLES: "roles",
   ADD_USER: "users/add",
+  UPDATE_USER: "users/update",
+  DELETE_USER: "users/delete",
 };

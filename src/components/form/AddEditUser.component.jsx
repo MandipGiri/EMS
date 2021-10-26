@@ -15,9 +15,17 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
 import moment from "moment";
 import { useFilePicker } from "use-file-picker";
-import { addUser, getDepartments, getRoles } from "../../services/ApiCalls";
+import {
+  addUser,
+  getDepartments,
+  getRoles,
+  updateUser,
+} from "../../services/ApiCalls";
 import { useDispatch } from "react-redux";
-import { getPendingUsersStart } from "../../redux/users/users.action";
+import {
+  getPendingUsersStart,
+  getUsersStart,
+} from "../../redux/users/users.action";
 import RootContext from "../../context/RootContext";
 
 const phoneRegExp = /^[2-9]{2}[0-9]{8}/;
@@ -47,10 +55,24 @@ const validationSchema = Yup.object().shape({
   academicInfo: Yup.string().required("Please add  Academic Info"),
 });
 
+const editValidationSchema = Yup.object().shape({
+  fullName: Yup.string().min(3, "It's too short").required("Required"),
+  email: Yup.string().email("Enter valid email").required("Required"),
+  dob: Yup.string().required("Required"),
+  contactNumber: Yup.string()
+    .matches(phoneRegExp, "Enter valid Phone number")
+    .required("Required")
+    .min(10, "Please input valid phone number"),
+  department: Yup.string(),
+  role: Yup.string(),
+  workExperience: Yup.string().required("Please add Work Experience"),
+  academicInfo: Yup.string().required("Please add  Academic Info"),
+});
+
 const AddEditUser = ({ data, handleCloseDialog }) => {
   const dispatch = useDispatch();
   const context = useContext(RootContext);
-  const isEdit = data ?? false;
+  const isEdit = data ? true : false;
   const [processing, setprocessing] = React.useState(false);
   const [departments, setdepartments] = React.useState([]);
   const [roles, setroles] = React.useState([]);
@@ -95,16 +117,16 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
   }, [roles]);
 
   const initialValues = {
-    fullName: "",
-    email: "",
-    dob: "",
-    contactNumber: "",
-    password: "",
-    confirmPassword: "",
-    department: "",
-    role: "",
-    workExperience: "",
-    academicInfo: "",
+    fullName: data?.fullName ?? "",
+    email: data?.email ?? "",
+    dob: data?.dateOfBirth ?? "",
+    contactNumber: data?.contactNumber ?? "",
+    password: data?.password ?? "",
+    confirmPassword: data?.password ?? "",
+    department: data?.department ?? "",
+    role: data?.role ?? "",
+    workExperience: data?.workExperience ?? "",
+    academicInfo: data?.academicInfo ?? "",
   };
 
   const {
@@ -117,34 +139,68 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
     setFieldValue,
   } = useFormik({
     initialValues,
-    validationSchema: validationSchema,
+    validationSchema: data ? editValidationSchema : validationSchema,
     onSubmit: (values) => {
-      let formData = new FormData();
-      formData.append("fullName", values.fullName);
-      formData.append("email", values.email);
-      formData.append("contactNumber", values.contactNumber);
-      formData.append("dateOfBirth", values.dob);
-      formData.append("password", values.password);
-      formData.append(
-        "department",
-        departments.find((item) => item.value == values.department).label
-      );
-      formData.append(
-        "role",
-        roles.find((item) => item.value == values.role).label
-      );
-      formData.append("workExperience", values.workExperience);
-      formData.append("academicInfo", values.academicInfo);
-      if (!!filesContent.length) {
-        // formData.append("document", {});
-      }
-      addUser(formData).then((res) => {
-        context?.showToastMessage("User added and sent to be verified.");
-        dispatch(getPendingUsersStart());
-        handleCloseDialog();
-      });
+      console.log(`values`, values);
+      if (isEdit) edit();
+      else add();
     },
   });
+
+  const add = () => {
+    let formData = new FormData();
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("contactNumber", values.contactNumber);
+    formData.append("dateOfBirth", values.dob);
+    formData.append("password", values.password);
+    formData.append(
+      "department",
+      departments.find((item) => item.value == values.department).label
+    );
+    formData.append(
+      "role",
+      roles.find((item) => item.value == values.role).label
+    );
+    formData.append("workExperience", values.workExperience);
+    formData.append("academicInfo", values.academicInfo);
+    if (!!filesContent.length) {
+      // formData.append("document", {});
+    }
+
+    addUser(formData).then((res) => {
+      context?.showToastMessage("User added and sent to be verified.");
+      dispatch(getPendingUsersStart());
+      handleCloseDialog();
+    });
+  };
+
+  const edit = () => {
+    let formData = new FormData();
+    formData.append("_id", data._id);
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("contactNumber", values.contactNumber);
+    formData.append("dateOfBirth", values.dob);
+
+    formData.append(
+      "department",
+      departments.find((item) => item.value == values.department).label
+    );
+    formData.append(
+      "role",
+      roles.find((item) => item.value == values.role).label
+    );
+    formData.append("workExperience", values.workExperience);
+    formData.append("academicInfo", values.academicInfo);
+
+    updateUser(data._id, formData).then((res) => {
+      console.log(`res`, res)
+      context?.showToastMessage("User updated successfully.");
+      dispatch(getUsersStart());
+      handleCloseDialog();
+    });
+  };
 
   const onPress = (event) => {
     event.preventDefault();
@@ -152,9 +208,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
   };
 
   useEffect(() => {
-    console.log(`values`, values);
     getRoles(values.department).then((res) => {
-      console.log(`res`, res);
       setroles(
         res.data.map((item) => {
           return { label: item.role, value: item._id };
@@ -162,6 +216,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
       );
     });
   }, [values.department]);
+
   return (
     <Grid>
       <Paper elevation={0} style={paperStyle}>
@@ -191,6 +246,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
             required
             fullWidth
             id={errors.email ? "outlined-error-helper-text" : "email"}
+            disabled={isEdit}
             label="Email Address"
             name="email"
             value={values.email}
@@ -320,43 +376,50 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
             error={errors.academicInfo ?? false}
             helperText={errors.academicInfo ?? ""}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id={errors.password ? "outlined-error-helper-text" : "password"}
-            label="Temp. Password"
-            name="password"
-            type="password"
-            value={values.password}
-            onChange={handleChange("password")}
-            error={errors.password ?? false}
-            helperText={errors.password ?? ""}
-          />
 
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id={
-              errors.confirmPassword
-                ? "outlined-error-helper-text"
-                : "confirmPassword"
-            }
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            value={values.confirmPassword}
-            onChange={handleChange("confirmPassword")}
-            error={errors.confirmPassword ?? false}
-            helperText={errors.confirmPassword ?? ""}
-          />
+          {!isEdit && (
+            <>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id={errors.password ? "outlined-error-helper-text" : "password"}
+                label="Temp. Password"
+                name="password"
+                type="password"
+                value={values.password}
+                onChange={handleChange("password")}
+                error={errors.password ?? false}
+                helperText={errors.password ?? ""}
+              />
 
-          <div onClick={() => openFileSelector()}>
-            <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              UPLOAD
-            </Button>
-          </div>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id={
+                  errors.confirmPassword
+                    ? "outlined-error-helper-text"
+                    : "confirmPassword"
+                }
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                value={values.confirmPassword}
+                onChange={handleChange("confirmPassword")}
+                error={errors.confirmPassword ?? false}
+                helperText={errors.confirmPassword ?? ""}
+              />
+            </>
+          )}
+
+          {!isEdit && (
+            <div onClick={() => openFileSelector()}>
+              <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                UPLOAD
+              </Button>
+            </div>
+          )}
           {!!filesContent.length && <img src={filesContent[0].content} />}
 
           <Button
@@ -366,7 +429,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
             sx={{ mt: 3, mb: 2 }}
             disabled={!(isValid && dirty)}
           >
-            {processing ? <CircularProgress /> : `ADD`}
+            {processing ? <CircularProgress /> : isEdit ? "UPDATE" : `ADD`}
           </Button>
         </Box>
       </Paper>

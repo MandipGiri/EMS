@@ -18,6 +18,9 @@ import { useDispatch, useSelector } from "react-redux";
 import RootContext from "../context/RootContext";
 import { STORAGE_CONSTANTS } from "../utilities/StorageConstants";
 import { useHistory } from "react-router-dom";
+import InfoIcon from "@mui/icons-material/Info";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required("Required").email("Invalid email"),
@@ -34,6 +37,7 @@ export default function Login() {
 
   const [processing, setprocessing] = useState(false);
   const [initialLoad, setinitialLoad] = useState(true);
+  const [showCreds, setshowCreds] = useState(false);
 
   const {
     handleChange,
@@ -124,12 +128,47 @@ export default function Login() {
               sx={{ mt: 3, mb: 2 }}
               disabled={!(isValid && dirty)}
             >
-              {processing ? <CircularProgress /> : `Sign In`}
+              {processing ? (
+                <CircularProgress style={{ color: "#fff" }} />
+              ) : (
+                `Sign In`
+              )}
             </Button>
-            <Grid>
-              <Typography>For test purposes for intial login use</Typography>
-              <Typography>Email: admin@ems.com</Typography>
-              <Typography>Password: admin@123</Typography>
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={8}
+                style={{ display: "flex", justifyContent: "flex-end" }}
+              >
+                <Typography
+                  component="h1"
+                  variant="h5"
+                  color="#1976d2"
+                  onClick={() => setshowCreds((prev) => !prev)}
+                >
+                  Need Help Loggin In ?
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                xs={1}
+                style={{ display: "flex", justifyContent: "flex-start" }}
+              >
+                <Tooltip title="Press to show creds">
+                  <IconButton>
+                    <InfoIcon style={{ color: "#1976d2" }} />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              {showCreds && (
+                <Grid style={{ marginLeft: 20 }}>
+                  <Typography>
+                    For test purposes for intial logging in use
+                  </Typography>
+                  <Typography>Email: admin@ems.com</Typography>
+                  <Typography>Password: admin@123</Typography>
+                </Grid>
+              )}
             </Grid>
           </Box>
         </Box>

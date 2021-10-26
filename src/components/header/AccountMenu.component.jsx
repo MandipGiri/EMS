@@ -10,15 +10,16 @@ import Logout from "@mui/icons-material/Logout";
 import ArrowDropDownRoundedIcon from "@mui/icons-material/ArrowDropDownRounded";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserStart } from "../../redux/user/user.action";
-import { selectUserInitials } from "../../redux/user/user.selector";
+import { selectUser, selectUserInitials } from "../../redux/user/user.selector";
 import { useHistory } from "react-router-dom";
 import RootContext from "../../context/RootContext.js";
 
-export default function AccountMenu() {
+export default function AccountMenu({ handleProfileOpenDialog }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const initials = useSelector(selectUserInitials);
   const context = React.useContext(RootContext);
+  const user = useSelector(selectUser);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -83,7 +84,7 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => handleProfileOpenDialog(user)}>
           <Avatar /> My Profile
         </MenuItem>
 

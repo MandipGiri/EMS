@@ -22,12 +22,13 @@ import GroupIcon from "@mui/icons-material/Group";
 import DomainVerificationIcon from "@mui/icons-material/DomainVerification";
 import Users from "../../pages/Users";
 import PendingUsers from "../../pages/PendingUsers";
-import AddEditUser from "../form/AddEditUser";
+import AddEditUser from "../form/AddEditUser.component";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
+import Profile from "../user/Profile.component";
 
 const drawerWidth = 240;
 
@@ -101,10 +102,14 @@ export default function MiniDrawer() {
   const [open, setOpen] = React.useState(true);
   const user = useSelector(selectUser);
   const { email, fullName, department, role } = user || {};
+  
+  const hasPermissionToEdit = role == "Admin" || role == "Line Manager";
 
   const [activeItem, setactiveItem] = React.useState("Users");
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openProfileDialog, setOpenProfileDialog] = React.useState(false);
   const [editableData, seteditableData] = React.useState(null);
+  const [profileData, setprofileData] = React.useState(null);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -121,6 +126,15 @@ export default function MiniDrawer() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+  };
+
+  const handleProfileOpenDialog = (data) => {
+    setOpenProfileDialog(true);
+    setprofileData(data);
+  };
+
+  const handleProfileCloseDialog = () => {
+    setOpenProfileDialog(false);
   };
 
   return (
@@ -144,7 +158,9 @@ export default function MiniDrawer() {
             Cloud Factory - EMS
           </Typography>
           <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
-            <AccountMenu />
+            <AccountMenu
+              {...{ handleProfileOpenDialog, handleProfileCloseDialog }}
+            />
           </Box>
         </Toolbar>
       </AppBar>
@@ -182,18 +198,38 @@ export default function MiniDrawer() {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {activeItem == "Users" ? (
-          <Users {...{ handleOpenDialog }} />
+          <Users {...{ handleOpenDialog, handleProfileOpenDialog }} />
         ) : (
-          <PendingUsers {...{ handleOpenDialog }} />
+          <PendingUsers {...{ handleOpenDialog, handleProfileOpenDialog }} />
         )}
 
         <Dialog open={openDialog} onClose={handleCloseDialog}>
           <DialogTitle>ADD USER</DialogTitle>
           <DialogContent>
-            <AddEditUser data={null} {...{handleCloseDialog}}/>
+            <AddEditUser data={editableData} {...{ handleCloseDialog }} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={openProfileDialog} onClose={handleProfileCloseDialog}>
+          <DialogTitle>MY PROFILE</DialogTitle>
+          <DialogContent>
+            <Profile data={profileData} />
+          </DialogContent>
+          <DialogActions>
+            {hasPermissionToEdit && (
+              <Button
+                onClick={() => {
+                  handleProfileCloseDialog();
+                  handleOpenDialog(user);
+                }}
+              >
+                Edit
+              </Button>
+            )}
+            <Button onClick={handleProfileCloseDialog}>Cancel</Button>
           </DialogActions>
         </Dialog>
       </Box>

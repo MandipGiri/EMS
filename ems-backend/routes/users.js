@@ -44,6 +44,11 @@ router
   .route("/add")
   .post(checkAuth, upload.single("document"), UserController.add_user);
 
+/* UPDATE  user */
+router
+  .route("/update/:userId")
+  .put(checkAuth, upload.single("document"), UserController.update_user);
+
 /* DELETE delete user */
 router.route("/delete/:userId").delete(checkAuth, UserController.delete_user);
 

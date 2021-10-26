@@ -4,27 +4,27 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
+import Button from "@mui/material/Button";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../redux/user/user.selector";
+import { getUsersStart } from "../redux/users/users.action";
 import { createStructuredSelector } from "reselect";
-import { selectPendingUsers } from "../redux/users/users.selector";
+import { selectUsers } from "../redux/users/users.selector";
 import moment from "moment";
-import { Typography } from "@mui/material";
-import { getPendingUsersStart } from "../redux/users/users.action";
-import { acceptUser } from "../services/ApiCalls";
+import { Grid, Typography } from "@mui/material";
+import { deleteUser } from "../services/ApiCalls";
+import ConfirmDialog from "../components/form/ConfirmationDialog.component";
 
-export default function PendingUsers({ handleOpenDialog }) {
+const Users = ({ handleOpenDialog, handleProfileOpenDialog }) => {
   const dispatch = useDispatch();
   const { user, users } = useSelector(
     createStructuredSelector({
       user: selectUser,
-      users: selectPendingUsers,
+      users: selectUsers,
     })
   );
 
@@ -33,27 +33,23 @@ export default function PendingUsers({ handleOpenDialog }) {
   const hasPermissionToEdit = role == "Admin" || role == "Line Manager";
 
   const [usersList, setusersList] = React.useState([]);
+  const [show, setshow] = React.useState(false);
+  const [selectedId, setselectedId] = React.useState(false);
 
   React.useEffect(() => {
-    dispatch(getPendingUsersStart());
+    dispatch(getUsersStart());
   }, []);
 
   React.useEffect(() => {
     if (users) setusersList(users);
   }, [users]);
 
-  const handleAccept = (userId) => {
-    acceptUser(userId).then((res) => {
-      dispatch(getPendingUsersStart());
-    });
-  };
-
   return (
     <React.Fragment>
       <Grid container spacing={2}>
         <Grid item xs={10}>
           <Typography variant="h5" color="#1976d2">
-            User Approvals
+            Users
           </Typography>
         </Grid>
         <Grid item xs={2}>
@@ -87,7 +83,11 @@ export default function PendingUsers({ handleOpenDialog }) {
               <TableCell>
                 {moment(row.createdAt).format(" ddd, DD/MM/YYYY")}
               </TableCell>
-              <TableCell>{row.fullName}</TableCell>
+              <TableCell onClick={() => handleProfileOpenDialog(row)}>
+                <Typography style={{ color: "#1976d2" }}>
+                  {row.fullName}
+                </Typography>
+              </TableCell>
               <TableCell>{row.department}</TableCell>
               <TableCell>{row.role}</TableCell>
               {hasPermissionToEdit && (
@@ -100,12 +100,18 @@ export default function PendingUsers({ handleOpenDialog }) {
                 >
                   <IconButton
                     aria-label="edit"
-                    onClick={() => handleAccept(row._id)}
+                    onClick={() => handleOpenDialog(row)}
                   >
-                    <CheckCircleIcon style={{ color: "#50c878" }} />
+                    <ModeEditIcon style={{ color: "#1976d2" }} />
                   </IconButton>
-                  <IconButton aria-label="delete">
-                    <CancelIcon style={{ color: "#FF0800" }} />
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => {
+                      setshow(true);
+                      setselectedId(row._id);
+                    }}
+                  >
+                    <DeleteIcon style={{ color: "#FF0800" }} />
                   </IconButton>
                 </TableCell>
               )}
@@ -113,6 +119,24 @@ export default function PendingUsers({ handleOpenDialog }) {
           ))}
         </TableBody>
       </Table>
+
+      <ConfirmDialog
+        show={show}
+        title={"Remove user"}
+        body={"Are you sure you want to remove this user?"}
+        postiveAction={() => {
+          deleteUser(selectedId).then((res) => {
+            setshow(false);
+            dispatch(getUsersStart());
+          });
+        }}
+        negativeAction={() => {
+          setselectedId(null);
+          setshow(false);
+        }}
+      />
     </React.Fragment>
   );
-}
+};
+
+export default Users;

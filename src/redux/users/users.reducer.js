@@ -15,6 +15,7 @@ export const usersReducer = (state = initialState, action) => {
         ...state,
         processing: true,
         error: null,
+        pendingList: [],
       };
     case UsersActionTypes.GET_USERS_SUCCESS:
       return {
@@ -34,8 +35,7 @@ export const usersReducer = (state = initialState, action) => {
         ...state,
         pendingList: action.payload,
       };
-      case UsersActionTypes.GET_USERS_PROCESSING:
-      case UsersActionTypes.GET_PENDING_USERS_FAILURE:
+    case UsersActionTypes.GET_PENDING_USERS_FAILURE:
       return {
         ...state,
         pendingList: [],

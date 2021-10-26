@@ -17,7 +17,14 @@ export const getRoles = (departmentId) => {
   return Axios.get(API_ENDPOINTS.GET_ROLES, { params: { departmentId } });
 };
 
-
 export const addUser = (data) => {
-  return Axios.post(API_ENDPOINTS.ADD_USER,data)
-}
+  return Axios.post(API_ENDPOINTS.ADD_USER, data);
+};
+
+export const updateUser = (userId, data) => {
+  return Axios.put(`${API_ENDPOINTS.UPDATE_USER}/${userId}`, data);
+};
+
+export const deleteUser = (userId) => {
+  return Axios.delete(`${API_ENDPOINTS.DELETE_USER}/${userId}`);
+};
