@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { STORAGE_CONSTANTS } from "./utilities/StorageConstants";
 import Navbar from "./components/header/Navbar.component";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
+
 import { Switch, Route, Redirect } from "react-router-dom";
 import ErrorBoundary from "./components/error-boundary/error-boundary.component";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,6 +12,8 @@ import { useSelector } from "react-redux";
 import { SetupAxios } from "./utilities/helpers/AxiosHelper";
 import { useHistory } from "react-router-dom";
 import Axios from "axios";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 
 const toastStyle = {
   position: "bottom-right",

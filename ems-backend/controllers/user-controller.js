@@ -90,6 +90,46 @@ exports.add_user = (req, res) => {
   });
 };
 
+/* update a user  */
+exports.update_user = (req, res) => {
+  const userId = req.params.userId;
+  console.log(`req.body`, req.body);
+
+  const {
+    fullName,
+    dateOfBirth,
+    email,
+    contactNumber,
+    department,
+    role,
+    workExperience,
+    academicInfo,
+  } = req.body;
+  let document = null;
+  if (req.file) document = req.file.path;
+
+  User.updateOne(
+    { _id: userId },
+    {
+      $set: {
+        isVerified: true,
+        fullName,
+        dateOfBirth,
+        email,
+        contactNumber,
+        department,
+        role,
+        workExperience,
+        academicInfo,
+      },
+    },
+    (error, response) => {
+      if (response) res.json("User Updated Successfully!");
+      else res.status(403).json("Error:" + error);
+    }
+  );
+};
+
 /* remove a user */
 exports.delete_user = (req, res) => {
   const userId = req.params.userId;
@@ -99,8 +139,7 @@ exports.delete_user = (req, res) => {
         if (err) res.status(400).json("Error: " + err);
         else res.json("User deleted successfully.");
       });
-    }
-    elsees.status(400).json("Error: " + error);
+    } else res.status(400).json("Error: " + error);
   });
 };
 
@@ -112,6 +151,19 @@ exports.get_user = (req, res) => {
     { password: 0, __v: 0, updatedAt: 0 },
     (error, user) => {
       if (user) res.json(user);
+      else res.status(403).json("Error:" + error);
+    }
+  );
+};
+
+/* get user detail */
+exports.accept_user = (req, res) => {
+  const userId = req.params.userId;
+  User.updateOne(
+    { _id: userId },
+    { $set: { isVerified: true } },
+    (error, response) => {
+      if (response) res.json("User is now a employee!");
       else res.status(403).json("Error:" + error);
     }
   );
