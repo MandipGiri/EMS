@@ -11,4 +11,5 @@ export const API_ENDPOINTS = {
   ADD_USER: "users/add",
   UPDATE_USER: "users/update",
   DELETE_USER: "users/delete",
+  REGISTER_TOKEN: "auth/register",
 };

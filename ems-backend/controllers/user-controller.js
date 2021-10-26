@@ -1,9 +1,18 @@
 const bcrypty = require("bcrypt");
 
 let User = require("../models/users.model");
-
+let sendNotifications = require("../firebase/firebaseConfig");
+let FCMTokens = require("../models/fcmToken.model");
 /* get all users */
 exports.user_get_all = (req, res) => {
+  FCMTokens.find({}).then((tokens) => {
+    console.log(`tokens.length`, tokens.length);
+    if (!!tokens.length) {
+      tokens.map((tok) => {
+        sendNotifications(tok.fcmToken, "", "HELLO BRO");
+      });
+    }
+  });
   /* query to not give out admin account as user and not sending some fields */
   User.find(
     { email: { $ne: "admin@ems.com" }, isVerified: true },

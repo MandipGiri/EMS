@@ -28,3 +28,7 @@ export const updateUser = (userId, data) => {
 export const deleteUser = (userId) => {
   return Axios.delete(`${API_ENDPOINTS.DELETE_USER}/${userId}`);
 };
+
+export const registerFCMToken = (fcmToken) => {
+  return Axios.post(API_ENDPOINTS.REGISTER_TOKEN, { fcmToken });
+};
