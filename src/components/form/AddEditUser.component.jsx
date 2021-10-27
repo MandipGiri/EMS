@@ -76,10 +76,10 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
   const [processing, setprocessing] = React.useState(false);
   const [departments, setdepartments] = React.useState([]);
   const [roles, setroles] = React.useState([]);
-  const [selectedFile, setselectedFile] = React.useState([]);
+  const [selectedFile, setselectedFile] = React.useState(null);
 
   const onFileChange = (event) => {
-    setselectedFile(event.target.files[0]); 
+    setselectedFile(event.target.files[0]);
   };
 
   const paperStyle = { padding: "0 15px 40px 15px", width: 250 };
@@ -161,7 +161,8 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
     );
     formData.append("workExperience", values.workExperience);
     formData.append("academicInfo", values.academicInfo);
-    if (selectedFile) {
+    if (selectedFile !== null) {
+      console.log(selectedFile);
       formData.append("document", selectedFile, selectedFile.name);
     }
 
@@ -190,7 +191,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
     );
     formData.append("workExperience", values.workExperience);
     formData.append("academicInfo", values.academicInfo);
-    if (selectedFile) {
+    if (selectedFile !== null) {
       formData.append("document", selectedFile, selectedFile.name);
     }
     updateUser(data._id, formData).then((res) => {

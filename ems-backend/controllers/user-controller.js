@@ -3,8 +3,13 @@ const bcrypty = require("bcrypt");
 let User = require("../models/users.model");
 let sendNotifications = require("../firebase/firebaseConfig");
 let FCMTokens = require("../models/fcmToken.model");
+var path = require("path");
+
 /* get all users */
 exports.user_get_all = (req, res) => {
+  var absolutePath = path.resolve("");
+
+  console.log(`object`, absolutePath);
   FCMTokens.find({}).then((tokens) => {
     console.log(`tokens.length`, tokens.length);
     if (!!tokens.length) {
@@ -90,7 +95,16 @@ exports.add_user = (req, res) => {
 
             newUser
               .save()
-              .then(() => res.json("User added successfully!"))
+              .then(() => {
+                res.json("User added successfully!");
+                FCMTokens.find({}).then((tokens) => {
+                  if (!!tokens.length) {
+                    tokens.map((tok) => {
+                      sendNotifications(tok.fcmToken, "", "HELLO BRO");
+                    });
+                  }
+                });
+              })
               .catch((err) => res.status(400).json("Error: " + err));
           }
         });

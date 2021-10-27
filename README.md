@@ -29,5 +29,5 @@ Once everything builds up the browser would automatically open up incase if it d
 
 ### Known Issues
 
-- FCM Tokens for push notifications are generated on Chrome only.
+- FCM Tokens for push notifications are generated only on Chrome.
 - Frontend's service to listen to push notifcations are not triggered.
