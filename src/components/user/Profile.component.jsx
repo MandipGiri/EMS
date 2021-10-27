@@ -16,7 +16,7 @@ import RootContext from "../../context/RootContext";
 import { getInitials } from "../../utilities/helpers/NameHelper";
 
 const Profile = ({ data }) => {
-  console.log(`data`, data)
+  console.log(`data`, data);
   const user = useSelector(selectUser);
   const showFullDetail = user.role == "Admin" || user.role == "Line Manager";
   const context = React.useContext(RootContext);

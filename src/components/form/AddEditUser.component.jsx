@@ -76,14 +76,11 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
   const [processing, setprocessing] = React.useState(false);
   const [departments, setdepartments] = React.useState([]);
   const [roles, setroles] = React.useState([]);
-  const [
-    openFileSelector,
-    { filesContent, loading, err, plainFiles },
-  ] = useFilePicker({
-    multiple: true,
-    accept: [".txt", ".pdf"],
-    limitFilesConfig: { min: 1, max: 1 },
-  });
+  const [selectedFile, setselectedFile] = React.useState([]);
+
+  const onFileChange = (event) => {
+    setselectedFile(event.target.files[0]); 
+  };
 
   const paperStyle = { padding: "0 15px 40px 15px", width: 250 };
 
@@ -164,8 +161,8 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
     );
     formData.append("workExperience", values.workExperience);
     formData.append("academicInfo", values.academicInfo);
-    if (!!filesContent.length) {
-      // formData.append("document", {});
+    if (selectedFile) {
+      formData.append("document", selectedFile, selectedFile.name);
     }
 
     addUser(formData).then((res) => {
@@ -193,9 +190,11 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
     );
     formData.append("workExperience", values.workExperience);
     formData.append("academicInfo", values.academicInfo);
-
+    if (selectedFile) {
+      formData.append("document", selectedFile, selectedFile.name);
+    }
     updateUser(data._id, formData).then((res) => {
-      console.log(`res`, res)
+      console.log(`res`, res);
       context?.showToastMessage("User updated successfully.");
       dispatch(getUsersStart());
       handleCloseDialog();
@@ -413,14 +412,7 @@ const AddEditUser = ({ data, handleCloseDialog }) => {
             </>
           )}
 
-          {!isEdit && (
-            <div onClick={() => openFileSelector()}>
-              <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                UPLOAD
-              </Button>
-            </div>
-          )}
-          {!!filesContent.length && <img src={filesContent[0].content} />}
+          <input type="file" onChange={onFileChange} />
 
           <Button
             type="submit"

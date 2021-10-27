@@ -130,6 +130,7 @@ exports.update_user = (req, res) => {
         role,
         workExperience,
         academicInfo,
+        document,
       },
     },
     (error, response) => {
