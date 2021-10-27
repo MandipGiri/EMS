@@ -14,6 +14,9 @@ import { useHistory } from "react-router-dom";
 import Axios from "axios";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import { getFCMToken, onMessageListener } from "./utilities/Firebase";
+import { selectUser } from "./redux/user/user.selector";
+import { registerFCMToken } from "./services/ApiCalls";
 
 const toastStyle = {
   position: "bottom-right",
@@ -28,7 +31,9 @@ const toastStyle = {
 function App() {
   const history = useHistory();
   const loginReducer = useSelector(selectLogin);
+  const user = useSelector(selectUser);
   const [isLoggedIn, setisLoggedIn] = useState(null);
+  const [fcmToken, setfcmToken] = useState(null);
 
   const showToastMessage = (message = "", type = "success") => {
     if (type == "success") {
@@ -44,7 +49,14 @@ function App() {
     history.replace("/");
   };
 
-  useEffect(() => {
+  useEffect(async () => {
+    const fcm = await getFCMToken();
+    setfcmToken(fcm);
+    onMessageListener()
+      .then((payload) => {
+        if (isLoggedIn) showToastMessage(payload.notification.body);
+      })
+      .catch((err) => console.log("failed: ", err));
     SetupAxios(showToastMessage, logout);
     const token = localStorage.getItem(STORAGE_CONSTANTS.ACCESS_TOKEN) ?? "";
     if (!!token) {
@@ -57,6 +69,14 @@ function App() {
     const { success } = loginReducer;
     if (success) setisLoggedIn(true);
   }, [loginReducer]);
+
+  useEffect(() => {
+    if (user) {
+      registerFCMToken(fcmToken)
+        .then((res) => console.log(`res`, res))
+        .catch((err) => console.log(`err.response`, err.response));
+    }
+  }, [user]);
 
   return (
     <div>

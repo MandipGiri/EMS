@@ -1,4 +1,5 @@
 let Users = require("../models/users.model");
+let FCMTokens = require("../models/fcmToken.model");
 const bcrypty = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -55,4 +56,22 @@ exports.profile = (req, res) => {
       else res.status(403).json("Error:" + error);
     }
   );
+};
+
+exports.registerToken = (req, res) => {
+  const userId = req.userData.userId;
+  FCMTokens.findOne({ userId }, (err, token) => {
+    if (token) {
+      FCMTokens.updateOne({ userId }, { $set: { fcmToken: req.body.fcmToken } })
+        .then((resp) => res.json("Token Updated Successfully!"))
+        .catch((ex) => res.status(403).json("Error:" + ex));
+    } else {
+      const newFcm = FCMTokens({ userId, fcmToken: req.body.fcmToken });
+
+      newFcm
+        .save()
+        .then((resp) => res.json("Token Added Successfully!"))
+        .catch((ex) => res.status(403).json("Error:" + ex));
+    }
+  });
 };

@@ -1,0 +1,2 @@
+export const REACT_APP_VAPID_KEY =
+  "BMY37AH5oGlUR04ah6NGFqmUKC_skTpQoTLm-Hwz7b6GBXOs-Za4lN_ov6P-gW8e70lOmM3gMztDxL5nLGdL0bA";

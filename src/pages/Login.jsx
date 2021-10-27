@@ -146,7 +146,7 @@ export default function Login() {
                   color="#1976d2"
                   onClick={() => setshowCreds((prev) => !prev)}
                 >
-                  Need Help Loggin In ?
+                  Need Help Logging In ?
                 </Typography>
               </Grid>
               <Grid
@@ -155,7 +155,7 @@ export default function Login() {
                 style={{ display: "flex", justifyContent: "flex-start" }}
               >
                 <Tooltip title="Press to show creds">
-                  <IconButton>
+                  <IconButton onClick={() => setshowCreds((prev) => !prev)}>
                     <InfoIcon style={{ color: "#1976d2" }} />
                   </IconButton>
                 </Tooltip>

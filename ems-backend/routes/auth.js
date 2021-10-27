@@ -12,4 +12,9 @@ router.route("/profile").get(checkAuth, AuthController.profile);
 router
   .route("/change-password")
   .post(checkAuth, AuthController.change_password);
+
+  /* change user password */
+router
+.route("/register")
+.post(checkAuth, AuthController.registerToken);
 module.exports = router;
