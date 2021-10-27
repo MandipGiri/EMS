@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const checkAuth = require("../middleware/check-auth");
 const multer = require("multer");
-var path = require("path");
 
 const storage = multer.diskStorage({
   destination: "uploads",

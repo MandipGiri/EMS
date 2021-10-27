@@ -7,7 +7,7 @@ exports.login = (req, res) => {
   const { email, password } = req.body;
   /* finding if user exists */
   Users.findOne({ email }, (err, response) => {
-    if (response) {
+    if (response && response.isVerified) {
       /* if exits checking if password matches */
       /* password are hashed every hash is not same so compare function from package needed*/
       bcrypty.compare(password, response.password, (error, result) => {
@@ -26,7 +26,11 @@ exports.login = (req, res) => {
           });
         } else res.status(401).json("Invalid password");
       });
-    } else res.status(400).json("No email address found.");
+    } else {
+      if (response) {
+        res.status(400).json("You are yet to be verified.");
+      } else res.status(400).json("No email address found.");
+    }
   });
 };
 

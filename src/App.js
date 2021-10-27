@@ -71,7 +71,7 @@ function App() {
   }, [loginReducer]);
 
   useEffect(() => {
-    if (user) {
+    if (user && (user.role === "Admin" || user.role === "Line Manager")) {
       registerFCMToken(fcmToken)
         .then((res) => console.log(`res`, res))
         .catch((err) => console.log(`err.response`, err.response));
